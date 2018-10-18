@@ -45,6 +45,7 @@ public class app2048 extends Applet implements KeyListener{
   //Keeps track of the players score
   private static int scoreCount = 0;
   
+  //Loads all images from the resources folder
   public void loadImages(){
     try{
       image0 = ImageIO.read(new File("resources/image0.png"));
@@ -67,7 +68,7 @@ public class app2048 extends Applet implements KeyListener{
     }                       
   }
   
-  //Select the appropriate tile to draw
+  //Select the appropriate tile to draw from the grid
   public BufferedImage getImage(int value){
     if(value == 0){
       return image0;
@@ -104,9 +105,10 @@ public class app2048 extends Applet implements KeyListener{
   public void init(){
     this.addKeyListener(this);
     
-    //Create the background
+    //Create the background and score backing
     int scorespace = fPT/4;
-    background = new Rectangle(fPL,scorespace, tile_size*4 + tile_padding*5, fPT/2 + tile_size*4 + tile_padding*5 + scorespace);
+    background = new Rectangle(fPL,scorespace, tile_size*4 + tile_padding*5, 
+                               fPT/2 + tile_size*4 + tile_padding*5 + scorespace);
   
     //Insert the initial value into the grid
     insertValue(grid);
@@ -117,6 +119,7 @@ public class app2048 extends Applet implements KeyListener{
     //Loads Images, would prefer to do this only once -- needs attention
     loadImages();
     g2.fill(background);
+    //Displays the score
     g2.setColor(Color.white);
     g2.setFont(new Font("TimesRoman", Font.PLAIN, 32)); 
     g2.drawString("SCORE", fPL + 5, fPT - 20);
@@ -151,6 +154,7 @@ public class app2048 extends Applet implements KeyListener{
       { 0, 0, 0, 0 }, 
       { 0, 0, 0, 0 },
       { 0, 0, 0, 0 } };
+    //Takes a copy of the grid before any adjustments are made
     for(int i=0; i<grid.length; i++){
       for(int j=0; j<grid[i].length; j++){
         gridCheck[i][j]=grid[i][j];
@@ -186,7 +190,7 @@ public class app2048 extends Applet implements KeyListener{
     //Check to see if a valid move was made
     if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
          && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
-      //Check to see if no move is possible
+      //Check to see if no move is possible by playing every possible move
       mergeRows(gridCheck,"R");
       mergeRows(gridCheck,"L");
       mergeColsDown(gridCheck);
@@ -194,6 +198,7 @@ public class app2048 extends Applet implements KeyListener{
       if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
            && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
         System.out.println("Game Over man, game over");
+        //Needs a game over screen -- Needs attention
         return;
       }
     }else{
@@ -217,9 +222,11 @@ public class app2048 extends Applet implements KeyListener{
       if(grid[i][j] == 0){
         if(Math.random() <= 0.1){
           grid[i][j] = 4;
+          //Increment the score counter accordingly
           scoreCount += 4;
         }else{ 
           grid[i][j] = 2;
+          //Increment the score counter accordingly
           scoreCount += 2;
         }
       }else{
@@ -228,6 +235,7 @@ public class app2048 extends Applet implements KeyListener{
     }
   }
   
+  //Merges a single row of all like tiles left and pushes all tiles left
   public static int[] mergeRowLeft(int[] grid){
     int[] newGrid = {0,0,0,0};
     for(int i = 0; i<3; i++){
@@ -252,6 +260,7 @@ public class app2048 extends Applet implements KeyListener{
     return newGrid;
   }
   
+  //Merges a single row of all like tiles and pushes all tiles right
   public static int[] mergeRowRight(int[] grid){
     int[] newGrid = {0,0,0,0};
     for(int i = 3; i>0; i--){
@@ -276,6 +285,7 @@ public class app2048 extends Applet implements KeyListener{
     return newGrid;
   }
   
+  //Merges all like tiles up in every column and pushes all tiles up
   static void mergeColsUp(int[][] grid){
     int col0[] = {0,0,0,0};
     int col1[] = {0,0,0,0};
@@ -302,6 +312,7 @@ public class app2048 extends Applet implements KeyListener{
     }
   }
   
+  //Merges all like tiles down in every column and pushes all tiles down
   static void mergeColsDown(int[][]grid){
     int col0[] = {0,0,0,0};
     int col1[] = {0,0,0,0};

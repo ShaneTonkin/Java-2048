@@ -1,11 +1,9 @@
 import java.applet.Applet;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Rectangle;
+import java.awt.*;
+import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import javax.imageio.ImageIO;
 import java.lang.Math;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,123 +17,131 @@ public class app2048 extends Applet implements KeyListener{
     { 0, 0, 0, 0 },
     { 0, 0, 0, 0 } };
   
-  //Visual representations of each tile
-  private Rectangle rect00;
-  private Rectangle rect01;
-  private Rectangle rect02;
-  private Rectangle rect03;
-  private Rectangle rect10;
-  private Rectangle rect11;
-  private Rectangle rect12;
-  private Rectangle rect13;
-  private Rectangle rect20;
-  private Rectangle rect21;
-  private Rectangle rect22;
-  private Rectangle rect23;
-  private Rectangle rect30;
-  private Rectangle rect31;
-  private Rectangle rect32;
-  private Rectangle rect33;
+  private Rectangle background;
   
-  private int x_topleft = 5;
-  private int y_topleft = 5;
+  //Storage of images
+  private BufferedImage image0;
+  private BufferedImage image2;
+  private BufferedImage image4;
+  private BufferedImage image8;
+  private BufferedImage image16;
+  private BufferedImage image32;
+  private BufferedImage image64;
+  private BufferedImage image128;
+  private BufferedImage image256;
+  private BufferedImage image512;
+  private BufferedImage image1024;
+  private BufferedImage image2048;
+  private BufferedImage image4096;
+  private BufferedImage image8192;
+  
+  //FramePaddingLeft;
+  private int fPL = 44;
+  //FramePaddingTop;
+  private int fPT = 80;
+  //Sets the size for each tile and space between tiles
   private int tile_padding = 5;
   private int tile_size = 70;
+  //Keeps track of the players score
+  private static int scoreCount = 0;
+  
+  public void loadImages(){
+    try{
+      image0 = ImageIO.read(new File("resources/image0.png"));
+      image2 = ImageIO.read(new File("resources/image2.png"));
+      image4 = ImageIO.read(new File("resources/image4.png"));
+      image8 = ImageIO.read(new File("resources/image8.png"));
+      image16 = ImageIO.read(new File("resources/image16.png"));
+      image32 = ImageIO.read(new File("resources/image32.png"));
+      image64 = ImageIO.read(new File("resources/image64.png"));
+      image128 = ImageIO.read(new File("resources/image128.png"));
+      image256 = ImageIO.read(new File("resources/image256.png"));
+      image512 = ImageIO.read(new File("resources/image512.png"));
+      image1024 = ImageIO.read(new File("resources/image1024.png"));
+      image2048 = ImageIO.read(new File("resources/image2048.png"));
+      image4096 = ImageIO.read(new File("resources/image4096.png"));
+      image8192 = ImageIO.read(new File("resources/image8192.png"));
+      
+    }catch (IOException e){
+      e.printStackTrace();
+    }                       
+  }
+  
+  //Select the appropriate tile to draw
+  public BufferedImage getImage(int value){
+    if(value == 0){
+      return image0;
+    }else if(value == 2){
+      return image2;
+    }else if(value == 4){
+      return image4;
+    }else if(value == 8){
+      return image8;
+    }else if(value == 16){
+      return image16;
+    }else if(value == 32){
+      return image32;
+    }else if(value == 64){
+      return image64;
+    }else if(value == 128){
+      return image128;
+    }else if(value == 256){
+      return image256;
+    }else if(value == 512){
+      return image512;
+    }else if(value == 1024){
+      return image1024;
+    }else if(value == 2048){
+      return image2048;
+    }else if(value == 4096){
+      return image4096;
+    }else{
+      return image8192;
+    }
+  }
+  
   
   public void init(){
     this.addKeyListener(this);
     
-    //Create top row of tiles
-    rect00 = new Rectangle(x_topleft, y_topleft, tile_size, tile_size);
-    rect01 = new Rectangle(x_topleft + tile_size + tile_padding, y_topleft, tile_size, tile_size);
-    rect02 = new Rectangle(x_topleft + 2*tile_size + 2*tile_padding, y_topleft, tile_size, tile_size);
-    rect03 = new Rectangle(x_topleft + 3*tile_size + 3*tile_padding, y_topleft, tile_size, tile_size);
-    
-    //Create 2nd row of tiles
-    rect10 = new Rectangle(x_topleft, y_topleft + tile_size + tile_padding, tile_size, tile_size);
-    rect11 = new Rectangle(x_topleft + tile_size + tile_padding,
-                           y_topleft + tile_size + tile_padding, tile_size, tile_size);
-    rect12 = new Rectangle(x_topleft + 2*tile_size + 2*tile_padding, 
-                           y_topleft + tile_size + tile_padding, tile_size, tile_size);
-    rect13 = new Rectangle(x_topleft + 3*tile_size + 3*tile_padding, 
-                           y_topleft + tile_size + tile_padding, tile_size, tile_size);
-    
-    //Create 3rd row of tiles
-    rect20 = new Rectangle(x_topleft, y_topleft + 2*tile_size + 2*tile_padding, tile_size, tile_size);
-    rect21 = new Rectangle(x_topleft + tile_size + tile_padding,
-                           y_topleft + 2*tile_size + 2*tile_padding, tile_size, tile_size);
-    rect22 = new Rectangle(x_topleft + 2*tile_size + 2*tile_padding, 
-                           y_topleft + 2*tile_size + 2*tile_padding, tile_size, tile_size);
-    rect23 = new Rectangle(x_topleft + 3*tile_size + 3*tile_padding,
-                           y_topleft + 2*tile_size + 2*tile_padding, tile_size, tile_size);
-    
-    //Create 4th row of tiles
-    rect30 = new Rectangle(x_topleft, y_topleft + 3*tile_size + 3*tile_padding, tile_size, tile_size);
-    rect31 = new Rectangle(x_topleft + tile_size + tile_padding,
-                           y_topleft + 3*tile_size + 3*tile_padding, tile_size, tile_size);
-    rect32 = new Rectangle(x_topleft + 2*tile_size + 2*tile_padding, 
-                           y_topleft + 3*tile_size + 3*tile_padding, tile_size, tile_size);
-    rect33 = new Rectangle(x_topleft + 3*tile_size + 3*tile_padding,
-                           y_topleft + 3*tile_size + 3*tile_padding, tile_size, tile_size);
-    
+    //Create the background
+    int scorespace = fPT/4;
+    background = new Rectangle(fPL,scorespace, tile_size*4 + tile_padding*5, fPT/2 + tile_size*4 + tile_padding*5 + scorespace);
+  
     //Insert the initial value into the grid
     insertValue(grid);
   }
   
   public void paint(Graphics g){
     Graphics2D g2 = (Graphics2D)g;
-    //Draws the 4 x 4 grid of squares
-    g2.fill(rect00);
-    g2.fill(rect01);
-    g2.fill(rect02);
-    g2.fill(rect03);
-    g2.fill(rect10);
-    g2.fill(rect11);
-    g2.fill(rect12);
-    g2.fill(rect13);
-    g2.fill(rect20);
-    g2.fill(rect21);
-    g2.fill(rect22);
-    g2.fill(rect23);
-    g2.fill(rect30);
-    g2.fill(rect31);
-    g2.fill(rect32);
-    g2.fill(rect33);
-    //Change colour to white and changes font for drawing the number in the square
-    g2.setColor(Color.WHITE);
-    g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
-    if(grid[0][0] != 0){
-      g2.drawString(Integer.toString(grid[0][0]), 35, 45);
-    }if(grid[0][1] != 0){
-      g2.drawString(Integer.toString(grid[0][1]), 35 + tile_size + tile_padding, 45);
-    }if(grid[0][2] != 0){
-      g2.drawString(Integer.toString(grid[0][2]), 35 + 2*tile_size + 2*tile_padding, 45);
-    }if(grid[0][3] != 0){
-      g2.drawString(Integer.toString(grid[0][3]), 35 + 3*tile_size + 3*tile_padding, 45);
-    }if(grid[1][0] != 0){
-      g2.drawString(Integer.toString(grid[1][0]), 35, 45+tile_size+tile_padding);
-    }if(grid[1][1] != 0){
-      g2.drawString(Integer.toString(grid[1][1]), 35 + tile_size + tile_padding, 45+tile_size+tile_padding);
-    }if(grid[1][2] != 0){
-      g2.drawString(Integer.toString(grid[1][2]), 35 + 2*tile_size + 2*tile_padding, 45+tile_size+tile_padding);
-    }if(grid[1][3] != 0){
-      g2.drawString(Integer.toString(grid[1][3]), 35 + 3*tile_size + 3*tile_padding, 45+tile_size+tile_padding);
-    }if(grid[2][0] != 0){
-      g2.drawString(Integer.toString(grid[2][0]), 35, 45+2*tile_size+2*tile_padding);
-    }if(grid[2][1] != 0){
-      g2.drawString(Integer.toString(grid[2][1]), 35 + tile_size + tile_padding, 45+2*tile_size+2*tile_padding);
-    }if(grid[2][2] != 0){
-      g2.drawString(Integer.toString(grid[2][2]), 35 + 2*tile_size + 2*tile_padding, 45+2*tile_size+2*tile_padding);
-    }if(grid[2][3] != 0){
-      g2.drawString(Integer.toString(grid[2][3]), 35 + 3*tile_size + 3*tile_padding, 45+2*tile_size+2*tile_padding);
-    }if(grid[3][0] != 0){
-      g2.drawString(Integer.toString(grid[3][0]), 35, 45+3*tile_size+3*tile_padding);
-    }if(grid[3][1] != 0){
-      g2.drawString(Integer.toString(grid[3][1]), 35 + tile_size + tile_padding, 45+3*tile_size+3*tile_padding);
-    }if(grid[3][2] != 0){
-      g2.drawString(Integer.toString(grid[3][2]), 35 + 2*tile_size + 2*tile_padding, 45+3*tile_size+3*tile_padding);
-    }if(grid[3][3] != 0){
-      g2.drawString(Integer.toString(grid[3][3]), 35 + 3*tile_size + 3*tile_padding, 45+3*tile_size+3*tile_padding);
+    //Loads Images, would prefer to do this only once -- needs attention
+    loadImages();
+    g2.fill(background);
+    g2.setColor(Color.white);
+    g2.setFont(new Font("TimesRoman", Font.PLAIN, 32)); 
+    g2.drawString("SCORE", fPL + 5, fPT - 20);
+    FontMetrics fontMetrics = g2.getFontMetrics();
+    String s = Integer.toString(scoreCount);
+    g2.drawString(s, 340 - fontMetrics.stringWidth(s), fPT-20);;
+    //Draw top line of tiles
+    for(int i = 0; i < 4; i++){
+      g2.drawImage(getImage(grid[0][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + tile_padding,
+                   tile_size, tile_size, null);
+    }
+    //Draw 2nd line of tiles
+    for(int i = 0; i < 4; i++){
+      g2.drawImage(getImage(grid[1][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + 2*tile_padding+tile_size,
+                   tile_size, tile_size, null);
+    }
+    //Draw 3rd line of tiles
+    for(int i = 0; i < 4; i++){
+      g2.drawImage(getImage(grid[2][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + 3*tile_padding+2*tile_size,
+                   tile_size, tile_size, null);
+    }
+    //Draw final line of tiles
+    for(int i = 0; i < 4; i++){
+      g2.drawImage(getImage(grid[3][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + 4*tile_padding+3*tile_size,
+                   tile_size, tile_size, null);
     }
   }
   
@@ -170,17 +176,16 @@ public class app2048 extends Applet implements KeyListener{
           grid[j][i] = 0;
         }
       }
+      scoreCount = 0;
       insertValue(grid);
       repaint();
       return;
     }else{
-      System.out.println("Invalid Key Press: " + e.getKeyChar());
       return;
     }
     //Check to see if a valid move was made
     if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
          && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
-      System.out.println("Invalid move");
       //Check to see if no move is possible
       mergeRows(gridCheck,"R");
       mergeRows(gridCheck,"L");
@@ -212,8 +217,10 @@ public class app2048 extends Applet implements KeyListener{
       if(grid[i][j] == 0){
         if(Math.random() <= 0.1){
           grid[i][j] = 4;
+          scoreCount += 4;
         }else{ 
           grid[i][j] = 2;
+          scoreCount += 2;
         }
       }else{
         insertValue(grid); 
