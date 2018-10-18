@@ -38,9 +38,12 @@ public class app2048 extends Applet implements KeyListener{
   //FramePaddingLeft;
   private int fPL = 44;
   //FramePaddingTop;
-  private int fPT = 10;
+  private int fPT = 80;
+  //Sets the size for each tile and space between tiles
   private int tile_padding = 5;
   private int tile_size = 70;
+  //Keeps track of the players score
+  private static int scoreCount = 0;
   
   public void loadImages(){
     try{
@@ -102,7 +105,8 @@ public class app2048 extends Applet implements KeyListener{
     this.addKeyListener(this);
     
     //Create the background
-    background = new Rectangle(fPL,fPT, tile_size*4 + tile_padding*5, tile_size*4 + tile_padding*5);
+    int scorespace = fPT/4;
+    background = new Rectangle(fPL,scorespace, tile_size*4 + tile_padding*5, fPT/2 + tile_size*4 + tile_padding*5 + scorespace);
   
     //Insert the initial value into the grid
     insertValue(grid);
@@ -112,8 +116,13 @@ public class app2048 extends Applet implements KeyListener{
     Graphics2D g2 = (Graphics2D)g;
     //Loads Images, would prefer to do this only once -- needs attention
     loadImages();
-    //Draws the 4 x 4 grid of squares in Black
     g2.fill(background);
+    g2.setColor(Color.white);
+    g2.setFont(new Font("TimesRoman", Font.PLAIN, 32)); 
+    g2.drawString("SCORE", fPL + 5, fPT - 20);
+    FontMetrics fontMetrics = g2.getFontMetrics();
+    String s = Integer.toString(scoreCount);
+    g2.drawString(s, 340 - fontMetrics.stringWidth(s), fPT-20);;
     //Draw top line of tiles
     for(int i = 0; i < 4; i++){
       g2.drawImage(getImage(grid[0][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + tile_padding,
@@ -167,17 +176,16 @@ public class app2048 extends Applet implements KeyListener{
           grid[j][i] = 0;
         }
       }
+      scoreCount = 0;
       insertValue(grid);
       repaint();
       return;
     }else{
-      System.out.println("Invalid Key Press: " + e.getKeyChar());
       return;
     }
     //Check to see if a valid move was made
     if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
          && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
-      System.out.println("Invalid move");
       //Check to see if no move is possible
       mergeRows(gridCheck,"R");
       mergeRows(gridCheck,"L");
@@ -209,8 +217,10 @@ public class app2048 extends Applet implements KeyListener{
       if(grid[i][j] == 0){
         if(Math.random() <= 0.1){
           grid[i][j] = 4;
+          scoreCount += 4;
         }else{ 
           grid[i][j] = 2;
+          scoreCount += 2;
         }
       }else{
         insertValue(grid); 
