@@ -9,6 +9,7 @@ import java.awt.Rectangle;
 import java.lang.Math;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.stream.*;
 
 public class app2048 extends Applet implements KeyListener{
   
@@ -83,6 +84,7 @@ public class app2048 extends Applet implements KeyListener{
   
   public void paint(Graphics g){
     Graphics2D g2 = (Graphics2D)g;
+    //Draws the 4 x 4 grid of squares
     g2.fill(rect00);
     g2.fill(rect01);
     g2.fill(rect02);
@@ -99,27 +101,56 @@ public class app2048 extends Applet implements KeyListener{
     g2.fill(rect31);
     g2.fill(rect32);
     g2.fill(rect33);
+    //Change colour to white and changes font for drawing the number in the square
     g2.setColor(Color.WHITE);
     g2.setFont(new Font("TimesRoman", Font.BOLD, 20));
-    g2.drawString(Integer.toString(grid[0][0]), 35, 45);
-    g2.drawString(Integer.toString(grid[0][1]), 35 + tile_size + tile_padding, 45);
-    g2.drawString(Integer.toString(grid[0][2]), 35 + 2*tile_size + 2*tile_padding, 45);
-    g2.drawString(Integer.toString(grid[0][3]), 35 + 3*tile_size + 3*tile_padding, 45);
-    g2.drawString(Integer.toString(grid[1][0]), 35, 45+tile_size+tile_padding);
-    g2.drawString(Integer.toString(grid[1][1]), 35 + tile_size + tile_padding, 45+tile_size+tile_padding);
-    g2.drawString(Integer.toString(grid[1][2]), 35 + 2*tile_size + 2*tile_padding, 45+tile_size+tile_padding);
-    g2.drawString(Integer.toString(grid[1][3]), 35 + 3*tile_size + 3*tile_padding, 45+tile_size+tile_padding);
-    g2.drawString(Integer.toString(grid[2][0]), 35, 45+2*tile_size+2*tile_padding);
-    g2.drawString(Integer.toString(grid[2][1]), 35 + tile_size + tile_padding, 45+2*tile_size+2*tile_padding);
-    g2.drawString(Integer.toString(grid[2][2]), 35 + 2*tile_size + 2*tile_padding, 45+2*tile_size+2*tile_padding);
-    g2.drawString(Integer.toString(grid[2][3]), 35 + 3*tile_size + 3*tile_padding, 45+2*tile_size+2*tile_padding);
-    g2.drawString(Integer.toString(grid[3][0]), 35, 45+3*tile_size+3*tile_padding);
-    g2.drawString(Integer.toString(grid[3][1]), 35 + tile_size + tile_padding, 45+3*tile_size+3*tile_padding);
-    g2.drawString(Integer.toString(grid[3][2]), 35 + 2*tile_size + 2*tile_padding, 45+3*tile_size+3*tile_padding);
-    g2.drawString(Integer.toString(grid[3][3]), 35 + 3*tile_size + 3*tile_padding, 45+3*tile_size+3*tile_padding);
+    if(grid[0][0] != 0){
+      g2.drawString(Integer.toString(grid[0][0]), 35, 45);
+    }if(grid[0][1] != 0){
+      g2.drawString(Integer.toString(grid[0][1]), 35 + tile_size + tile_padding, 45);
+    }if(grid[0][2] != 0){
+      g2.drawString(Integer.toString(grid[0][2]), 35 + 2*tile_size + 2*tile_padding, 45);
+    }if(grid[0][3] != 0){
+      g2.drawString(Integer.toString(grid[0][3]), 35 + 3*tile_size + 3*tile_padding, 45);
+    }if(grid[1][0] != 0){
+      g2.drawString(Integer.toString(grid[1][0]), 35, 45+tile_size+tile_padding);
+    }if(grid[1][1] != 0){
+      g2.drawString(Integer.toString(grid[1][1]), 35 + tile_size + tile_padding, 45+tile_size+tile_padding);
+    }if(grid[1][2] != 0){
+      g2.drawString(Integer.toString(grid[1][2]), 35 + 2*tile_size + 2*tile_padding, 45+tile_size+tile_padding);
+    }if(grid[1][3] != 0){
+      g2.drawString(Integer.toString(grid[1][3]), 35 + 3*tile_size + 3*tile_padding, 45+tile_size+tile_padding);
+    }if(grid[2][0] != 0){
+      g2.drawString(Integer.toString(grid[2][0]), 35, 45+2*tile_size+2*tile_padding);
+    }if(grid[2][1] != 0){
+      g2.drawString(Integer.toString(grid[2][1]), 35 + tile_size + tile_padding, 45+2*tile_size+2*tile_padding);
+    }if(grid[2][2] != 0){
+      g2.drawString(Integer.toString(grid[2][2]), 35 + 2*tile_size + 2*tile_padding, 45+2*tile_size+2*tile_padding);
+    }if(grid[2][3] != 0){
+      g2.drawString(Integer.toString(grid[2][3]), 35 + 3*tile_size + 3*tile_padding, 45+2*tile_size+2*tile_padding);
+    }if(grid[3][0] != 0){
+      g2.drawString(Integer.toString(grid[3][0]), 35, 45+3*tile_size+3*tile_padding);
+    }if(grid[3][1] != 0){
+      g2.drawString(Integer.toString(grid[3][1]), 35 + tile_size + tile_padding, 45+3*tile_size+3*tile_padding);
+    }if(grid[3][2] != 0){
+      g2.drawString(Integer.toString(grid[3][2]), 35 + 2*tile_size + 2*tile_padding, 45+3*tile_size+3*tile_padding);
+    }if(grid[3][3] != 0){
+      g2.drawString(Integer.toString(grid[3][3]), 35 + 3*tile_size + 3*tile_padding, 45+3*tile_size+3*tile_padding);
+    }
   }
   
   public void keyPressed(KeyEvent e){
+    //Create a copy of the grid before a move is made
+    int gridCheck[][] = { { 0, 0, 0, 0 }, 
+      { 0, 0, 0, 0 }, 
+      { 0, 0, 0, 0 },
+      { 0, 0, 0, 0 } };
+    for(int i=0; i<grid.length; i++){
+      for(int j=0; j<grid[i].length; j++){
+        gridCheck[i][j]=grid[i][j];
+      }
+    }
+    
     if(e.getKeyCode() == KeyEvent.VK_RIGHT){
       //Shift all tiles right
       mergeRows(grid, "R");
@@ -128,13 +159,42 @@ public class app2048 extends Applet implements KeyListener{
       mergeRows(grid, "L");
     }else if(e.getKeyCode() == KeyEvent.VK_UP){
       //Shift all tiles up
-      mergeColumns(grid, "U");
+      mergeColsUp(grid);
     }else if(e.getKeyCode() == KeyEvent.VK_DOWN){
       //Shift all tiles down
-      mergeColumns(grid, "D");
+      mergeColsDown(grid);
+    }else if(e.getKeyCode() == KeyEvent.VK_R){
+      //Restart the game
+      for(int i = 0; i<4; i++){
+        for(int j = 0; j<4; j++){
+          grid[j][i] = 0;
+        }
+      }
+      insertValue(grid);
+      repaint();
+      return;
+    }else{
+      System.out.println("Invalid Key Press: " + e.getKeyChar());
+      return;
     }
-    insertValue(grid);
-    repaint();
+    //Check to see if a valid move was made
+    if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
+         && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
+      System.out.println("Invalid move");
+      //Check to see if no move is possible
+      mergeRows(gridCheck,"R");
+      mergeRows(gridCheck,"L");
+      mergeColsDown(gridCheck);
+      mergeColsUp(gridCheck);
+      if(Arrays.equals(gridCheck[0], grid[0]) &&  Arrays.equals(gridCheck[1], grid[1])
+           && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
+        System.out.println("Game Over man, game over");
+        return;
+      }
+    }else{
+      insertValue(grid);
+      repaint();
+    }
   }
   
   public void keyReleased(KeyEvent e){
@@ -156,7 +216,7 @@ public class app2048 extends Applet implements KeyListener{
           grid[i][j] = 2;
         }
       }else{
-        insertValue(grid);    
+        insertValue(grid); 
       }
     }
   }
@@ -209,24 +269,59 @@ public class app2048 extends Applet implements KeyListener{
     return newGrid;
   }
   
-   static int[] mergeColumnUp(int grid[][], int col){
-    int arr[] = {0,0,0,0};
-    for(int i = 0; i < 4; i++){
-      arr[i] = grid[i][col];
+  static void mergeColsUp(int[][] grid){
+    int col0[] = {0,0,0,0};
+    int col1[] = {0,0,0,0};
+    int col2[] = {0,0,0,0};
+    int col3[] = {0,0,0,0};
+    
+    for(int i = 0; i<4; i++){
+      col0[i] = grid[i][0];
+      col1[i] = grid[i][1];
+      col2[i] = grid[i][2];
+      col3[i] = grid[i][3];
     }
-    arr = mergeRowLeft(arr);
-    return arr;
+    
+    col0 = mergeRowLeft(col0);
+    col1 = mergeRowLeft(col1);
+    col2 = mergeRowLeft(col2);
+    col3 = mergeRowLeft(col3);
+    
+    for(int i=0; i<4; i++){
+      grid[i][0] = col0[i];
+      grid[i][1] = col1[i];
+      grid[i][2] = col2[i];
+      grid[i][3] = col3[i];
+    }
   }
   
-   static int[] mergeColumnDown(int grid[][], int col){
-    int arr[] = {0,0,0,0};
-    for(int i = 0; i < 4; i++){
-      arr[i] = grid[i][col];
+  static void mergeColsDown(int[][]grid){
+    int col0[] = {0,0,0,0};
+    int col1[] = {0,0,0,0};
+    int col2[] = {0,0,0,0};
+    int col3[] = {0,0,0,0};
+    
+    for(int i = 0; i<4; i++){
+      col0[i] = grid[i][0];
+      col1[i] = grid[i][1];
+      col2[i] = grid[i][2];
+      col3[i] = grid[i][3];
     }
-    arr = mergeRowRight(arr);
-    return arr;
+    
+    col0 = mergeRowRight(col0);
+    col1 = mergeRowRight(col1);
+    col2 = mergeRowRight(col2);
+    col3 = mergeRowRight(col3);
+    
+    for(int i=0; i<4; i++){
+      grid[i][0] = col0[i];
+      grid[i][1] = col1[i];
+      grid[i][2] = col2[i];
+      grid[i][3] = col3[i];
+    }
   }
   
+  //Main call for merging rows either left or right depending on what key is pressed
   public static void mergeRows(int[][] grid, String direction){
     if(direction == "L"){
       for(int i = 0; i < 4; i++){
@@ -239,23 +334,6 @@ public class app2048 extends Applet implements KeyListener{
     }
   }
   
-   public static void mergeColumns(int[][] grid, String direction){
-    if(direction == "U"){
-      for(int i = 0; i < 4; i++){
-        int[] tempArr = mergeColumnUp(grid, i);
-        for(int j = 0; j < 4; j++){
-          grid[i][j] = tempArr[j];
-        }
-      }
-    }else if(direction == "D"){
-      for(int i = 0; i < 4; i++){
-        int[] tempArr = mergeColumnDown(grid, i);
-        for(int j = 0; j < 4; j++){
-          grid[i][j] = tempArr[j];
-        }
-      } 
-    }
-  }
   
 }
 
