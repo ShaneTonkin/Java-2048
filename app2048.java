@@ -18,8 +18,9 @@ public class app2048 extends Applet implements KeyListener{
     { 0, 0, 0, 0 } };
   
   private Rectangle background;
+  private Boolean isGameOver = false;
   
-  //Storage of images
+  //Storage of images;
   private BufferedImage image0;
   private BufferedImage image2;
   private BufferedImage image4;
@@ -34,6 +35,7 @@ public class app2048 extends Applet implements KeyListener{
   private BufferedImage image2048;
   private BufferedImage image4096;
   private BufferedImage image8192;
+  private Rectangle gameOver;
   
   //FramePaddingLeft;
   private int fPL = 44;
@@ -42,6 +44,7 @@ public class app2048 extends Applet implements KeyListener{
   //Sets the size for each tile and space between tiles
   private int tile_padding = 5;
   private int tile_size = 70;
+  private int repaintCount = 0;
   //Keeps track of the players score
   private static int scoreCount = 0;
   
@@ -101,7 +104,7 @@ public class app2048 extends Applet implements KeyListener{
     }
   }
   
-  
+  //Runs once on start-up
   public void init(){
     this.addKeyListener(this);
     
@@ -146,6 +149,26 @@ public class app2048 extends Applet implements KeyListener{
       g2.drawImage(getImage(grid[3][i]), fPL + (i+1)*tile_padding + i*tile_size, fPT + 4*tile_padding+3*tile_size,
                    tile_size, tile_size, null);
     }
+    //If no more moves are possible display the game over screen
+    if(isGameOver){
+      g2.setColor(Color.lightGray);
+      gameOver = new Rectangle(fPL, fPT, 305, 305);
+      g2.fill(gameOver);
+      g2.setColor(Color.black);
+      g2.setFont(new Font("TimesRomanBold", Font.PLAIN, 46));
+      FontMetrics fontMetrics2 = g2.getFontMetrics();
+      String sGO = "Game Over!";
+      g2.drawString(sGO, fPL + (4*tile_size + 5*tile_padding)/2 - fontMetrics2.stringWidth(sGO)/2, fPT + 305/3);
+      g2.setFont(new Font("TimesRoman", Font.PLAIN, 22));
+      g2.setColor(Color.darkGray);
+      FontMetrics fontMetrics3 = g2.getFontMetrics();
+      String tip = "Press ' r ' to restart";
+      g2.drawString(tip, fPL + (4*tile_size + 5*tile_padding)/2 - fontMetrics3.stringWidth(tip)/2, fPT + 2*(305/3));
+      if(repaintCount < 1){
+        repaint();
+        repaintCount = 1;
+      }
+    }
   }
   
   public void keyPressed(KeyEvent e){
@@ -181,6 +204,8 @@ public class app2048 extends Applet implements KeyListener{
         }
       }
       scoreCount = 0;
+      repaintCount = 0;
+      isGameOver = false;
       insertValue(grid);
       repaint();
       return;
@@ -199,6 +224,7 @@ public class app2048 extends Applet implements KeyListener{
            && Arrays.equals(gridCheck[2], grid[2]) && Arrays.equals(gridCheck[3], grid[3])){
         System.out.println("Game Over man, game over");
         //Needs a game over screen -- Needs attention
+        isGameOver = true;
         return;
       }
     }else{
