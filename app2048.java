@@ -1,3 +1,9 @@
+/* Java implementation of 2048.
+ * The aim of the game is to merge like tiles to create the biggest tile possible.
+ * Play by pressing the left, right, down, or up arrows. When a key is pressed every tile will slide
+ * as far as it can in the corresponding direction. Press R to restart the game
+ */
+
 import java.applet.Applet;
 import java.awt.*;
 import java.awt.event.*;
